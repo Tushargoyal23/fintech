@@ -19,10 +19,23 @@ const UserSchema = new Schema({
         type:String,
         default:"0"
     },
-    isBlock:{
-        type:Boolean,
-        default:false
-    }    
+    date: {
+        type: Date,
+        required: true
+    },
+    address:{
+        type:String
+    },
+    city:{
+        type:String
+    },
+    country:{
+        type:String
+    },
+    postalCode:{
+        type:String
+    }
+     
 });
 
 module.exports = mongoose.model('user' , UserSchema)

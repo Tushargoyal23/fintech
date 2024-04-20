@@ -10,6 +10,7 @@ import SettingEditProfile from "pages/SettingEditProfile";
 import SignUpPage from "pages/SignUp/Page";
 import Login from "pages/SignIn/Page";
 import TransactionForm from "pages/TransactionForm/Page";
+import EditProfilePage from "pages/SettingEditProfile/Page";
 
 const ProjectRoutes = () => {
   let element = useRoutes([
@@ -32,7 +33,7 @@ const ProjectRoutes = () => {
       element: <Loan />,
     },
     {
-      path: "settingeditprofile",
+      path: "profile",
       element: <SettingEditProfile />,
     },
     {
@@ -47,8 +48,10 @@ const ProjectRoutes = () => {
       path: "transactionform",
       element: <TransactionForm/>,
     },
-    
-    
+    {
+      path: "editprofile",
+      element: <EditProfilePage/>,
+    },   
   ]);
 
   return element;

@@ -27,4 +27,49 @@ router.post('/createuser', async (req, res) => {
   }
 });
 
+router.get('/finduser/:email' , async (req , res)=> {
+  try {
+      const e=req.params.email
+      const items=await userModel.findOne({email:e}).select('-password');
+      res.send({
+           success:true,
+           data:items
+      })
+      
+  } catch (error) {
+      
+      res.json({success: false})
+  }
+})
+
+
+
+router.put('/updateuser/:email', async (req, res) => {
+  try {
+    const email = req.params.email;
+
+    const user = await userModel.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+
+    user.name = req.body.name || user.name; 
+    user.email=email;
+    user.address=req.body.name || user.name
+    user.address=req.body.name || user.name
+    user.address=req.body.name || user.name
+    user.address=req.body.name || user.name
+    user.address=req.body.name || user.name
+    
+
+
+    await user.save();
+    res.status(200).json({ success: true, message: 'User details updated successfully' });
+  } catch (error) {
+    console.error('Error updating user details:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+});
 module.exports = router;
