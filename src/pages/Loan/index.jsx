@@ -1,199 +1,210 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
+import axios from 'axios'
 import { Text, Heading, Button, Img } from "../../components";
 import Header from "../../components/Header";
 import { ReactTable } from "../../components/ReactTable";
 import Sidebar1 from "../../components/Sidebar1";
 import { createColumnHelper } from "@tanstack/react-table";
+import '../Loan.css'; // Import the CSS file
+// function calculateTotalRepayment(principal, monthlyRate, months) {
+//   const r = monthlyRate;
+//   const n = months;
 
-const table1Data = [
-  {
-    slno: "01.",
-    loanmoney: "$100,000",
-    lefttorepay: "$40,500",
-    duration: "8 Months",
-    interestrate: "12%",
-    installment: "$2,000 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "02.",
-    loanmoney: "$500,000",
-    lefttorepay: "$250,000",
-    duration: "36 Months",
-    interestrate: "10%",
-    installment: "$8,000 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "03.",
-    loanmoney: "$900,000",
-    lefttorepay: "$40,500",
-    duration: "12 Months",
-    interestrate: "12%",
-    installment: "$5,000 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "04.",
-    loanmoney: "$50,000",
-    lefttorepay: "$40,500",
-    duration: "25 Months",
-    interestrate: "5%",
-    installment: "$2,000 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "05.",
-    loanmoney: "$50,000",
-    lefttorepay: "$40,500",
-    duration: "5 Months",
-    interestrate: "16%",
-    installment: "$10,000 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "06.",
-    loanmoney: "$80,000",
-    lefttorepay: "$25,500",
-    duration: "14 Months",
-    interestrate: "8%",
-    installment: "$2,000 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "07.",
-    loanmoney: "$12,000",
-    lefttorepay: "$5,500",
-    duration: "9 Months",
-    interestrate: "13%",
-    installment: "$500 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "08.",
-    loanmoney: "$160,000",
-    lefttorepay: "$100,800",
-    duration: "3 Months",
-    interestrate: "12%",
-    installment: "$900 / month",
-    repay: "Repay",
-  },
-  {
-    slno: "Total",
-    loanmoney: "$125,0000",
-    lefttorepay: "$750,000",
-    duration: "8 Months",
-    interestrate: "12%",
-    installment: "$50,000 / month",
-    repay: "Repay",
-  },
-];
+//   const totalRepayment = principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+//   return totalRepayment;
+// }
+function calculateTotalRepayment(principal, annualRate, years) {
+  const monthlyRate = annualRate / 12 / 100; // Convert annual rate to monthly rate
+  const months = years; // Convert years to months
+
+  const totalRepayment = principal * Math.pow((1 + monthlyRate)/100, months);
+  return Math.floor( totalRepayment);
+}
+
+// Example usage:
+let date=new Date();
+ const year = date.getFullYear();
+  const month = `0${date.getMonth() + 1}`.slice(-2);
+  
+const day = `0${date.getDate()}`.slice(-2);
+const principal = 100000; // Principal amount
+const annualRate = 10; // Annual interest rate (in percentage)
+const years = 5; // Loan duration in years
+
+const totalRepayment = calculateTotalRepayment(principal, annualRate, years);
+console.log("Total repayment amount:", totalRepayment);
+
+// const totalRepayment = calculateTotalRepayment(principal, annualRate, months);
+// console.log("Total repayment amount:", totalRepayment.toFixed(2)); // Displaying result with 2 decimal places
+
+function calculateEMI(loanAmount, annualInterestRate, loanTenureYears) {
+  // Convert annual interest rate to monthly interest rate
+  let monthlyInterestRate = annualInterestRate / (12 * 100);
+
+  // Convert loan tenure from years to months
+  let loanTenureMonths = loanTenureYears;
+
+  // Calculate EMI using the formula
+  let emi = loanAmount * monthlyInterestRate * Math.pow(1 + monthlyInterestRate, loanTenureMonths) /
+    (Math.pow(1 + monthlyInterestRate, loanTenureMonths) - 1);
+
+  // Round the EMI to two decimal places
+  emi = Math.round(emi * 100) / 100;
+
+  return emi;
+}
+
+// Example usage:
+let loanAmount = 100000; // Loan amount in currency (e.g., dollars)
+let annualInterestRate = 10; // Annual interest rate (in percentage)
+let loanTenureYears = 5; // Loan tenure in years
+
+// Calculate EMI
+let emi = calculateEMI(loanAmount, annualInterestRate, loanTenureYears);
+
+
+
+
 
 export default function LoanPage() {
-  const table1Columns = React.useMemo(() => {
-    const table1ColumnHelper = createColumnHelper();
-    return [
-      table1ColumnHelper.accessor("slno", {
-        cell: (info) => (
-          <Text as="p" className="!text-blue_gray-900 text-base font-normal">
-            {info?.getValue?.()}
-          </Text>
-        ),
-        header: (info) => (
-          <Text as="p" className="pt-px pb-[11px] text-base font-medium">
-            SL No
-          </Text>
-        ),
-        meta: { width: "100px" },
-      }),
-      table1ColumnHelper.accessor("loanmoney", {
-        cell: (info) => (
-          <Text as="p" className="!text-blue_gray-900 text-base font-normal">
-            {info?.getValue?.()}
-          </Text>
-        ),
-        header: (info) => (
-          <Text as="p" className="pt-px pb-2.5 text-base font-medium">
-            Loan Money
-          </Text>
-        ),
-        meta: { width: "168px" },
-      }),
-      table1ColumnHelper.accessor("lefttorepay", {
-        cell: (info) => (
-          <Text as="p" className="!text-blue_gray-900 text-base font-normal">
-            {info?.getValue?.()}
-          </Text>
-        ),
-        header: (info) => (
-          <Text as="p" className="pt-px pb-2.5 text-base font-medium">
-            Left to repay
-          </Text>
-        ),
-        meta: { width: "174px" },
-      }),
-      table1ColumnHelper.accessor("duration", {
-        cell: (info) => (
-          <Text as="p" className="!text-blue_gray-900 text-base font-normal">
-            {info?.getValue?.()}
-          </Text>
-        ),
-        header: (info) => (
-          <Text as="p" className="pb-[11px] text-base font-medium">
-            Duration
-          </Text>
-        ),
-        meta: { width: "171px" },
-      }),
-      table1ColumnHelper.accessor("interestrate", {
-        cell: (info) => (
-          <Text as="p" className="!text-blue_gray-900 text-base font-normal">
-            {info?.getValue?.()}
-          </Text>
-        ),
-        header: (info) => (
-          <Text as="p" className="pt-px pb-[11px] text-base font-medium">
-            Interest rate
-          </Text>
-        ),
-        meta: { width: "147px" },
-      }),
-      table1ColumnHelper.accessor("installment", {
-        cell: (info) => (
-          <Text as="p" className="!text-blue_gray-900 text-base font-normal">
-            {info?.getValue?.()}
-          </Text>
-        ),
-        header: (info) => (
-          <Text as="p" className="pt-px pb-[11px] text-base font-medium">
-            Installment
-          </Text>
-        ),
-        meta: { width: "172px" },
-      }),
-      table1ColumnHelper.accessor("repay", {
-        cell: (info) => (
-          <div className="h-[20px] md:w-full relative">
-            <Text
-              size="lg"
-              as="p"
-              className="left-1/4 top-0 m-auto !text-indigo-500 text-center text-[15px] font-medium absolute"
-            >
-              {info?.getValue?.()}
-            </Text>
-            <div className="h-[35px] w-[85%] left-[2%] top-0 m-auto border-indigo-500 border border-solid absolute rounded-[17px]" />
-          </div>
-        ),
-        header: (info) => (
-          <Text as="p" className="pt-px pb-2.5 text-base font-medium">
-            Repay
-          </Text>
-        ),
-        meta: { width: "118px" },
-      }),
-    ];
+  const [loans, setLoans] = useState([]);
+  const Addrepay= async(id)=>{
+    console.log(id)
+    try {
+      const res = await axios.post(`http://localhost:5000/api/repay/${id}`)
+  
+      if (res.data.success) {
+        setLoans(res.data.data);
+        
+        console.log(loans)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  console.log(loans)
+  const getUsers = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/get-loans")
+
+      if (res.data.success) {
+        setLoans(res.data.data);
+        console.log(loans)
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getUsers();
   }, []);
+  
+
+
+  // const table1Columns = React.useMemo(() => {
+  //   const table1ColumnHelper = createColumnHelper();
+  //   return [
+  //     table1ColumnHelper.accessor("slno", {
+  //       cell: (info) => (
+  //         <Text as="p" className="!text-blue_gray-900 text-base font-normal">
+  //           {info?.getValue?.()}
+  //         </Text>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pt-px pb-[11px] text-base font-medium">
+  //           SL No
+  //         </Text>
+  //       ),
+  //       meta: { width: "100px" },
+  //     }),
+  //     table1ColumnHelper.accessor("loanmoney", {
+  //       cell: (info) => (
+  //         <Text as="p" className="!text-blue_gray-900 text-base font-normal">
+  //           {info?.getValue?.()}
+  //         </Text>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pt-px pb-2.5 text-base font-medium">
+  //           Loan Money
+  //         </Text>
+  //       ),
+  //       meta: { width: "168px" },
+  //     }),
+  //     table1ColumnHelper.accessor("lefttorepay", {
+  //       cell: (info) => (
+  //         <Text as="p" className="!text-blue_gray-900 text-base font-normal">
+  //           {info?.getValue?.()}
+  //         </Text>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pt-px pb-2.5 text-base font-medium">
+  //           Left to repay
+  //         </Text>
+  //       ),
+  //       meta: { width: "174px" },
+  //     }),
+  //     table1ColumnHelper.accessor("duration", {
+  //       cell: (info) => (
+  //         <Text as="p" className="!text-blue_gray-900 text-base font-normal">
+  //           {info?.getValue?.()}
+  //         </Text>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pb-[11px] text-base font-medium">
+  //           Duration
+  //         </Text>
+  //       ),
+  //       meta: { width: "171px" },
+  //     }),
+  //     table1ColumnHelper.accessor("interestrate", {
+  //       cell: (info) => (
+  //         <Text as="p" className="!text-blue_gray-900 text-base font-normal">
+  //           {info?.getValue?.()}
+  //         </Text>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pt-px pb-[11px] text-base font-medium">
+  //           Interest rate
+  //         </Text>
+  //       ),
+  //       meta: { width: "147px" },
+  //     }),
+  //     table1ColumnHelper.accessor("installment", {
+  //       cell: (info) => (
+  //         <Text as="p" className="!text-blue_gray-900 text-base font-normal">
+  //           {info?.getValue?.()}
+  //         </Text>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pt-px pb-[11px] text-base font-medium">
+  //           Installment
+  //         </Text>
+  //       ),
+  //       meta: { width: "172px" },
+  //     }),
+  //     table1ColumnHelper.accessor("repay", {
+  //       cell: (info) => (
+  //         <div className="h-[20px] md:w-full relative">
+  //           <Text
+  //             size="lg"
+  //             as="p"
+  //             className="left-1/4 top-0 m-auto !text-indigo-500 text-center text-[15px] font-medium absolute"
+  //           >
+  //             {info?.getValue?.()}
+  //           </Text>
+  //           <div className="h-[35px] w-[85%] left-[2%] top-0 m-auto border-indigo-500 border border-solid absolute rounded-[17px]" />
+  //         </div>
+  //       ),
+  //       header: (info) => (
+  //         <Text as="p" className="pt-px pb-2.5 text-base font-medium">
+  //           Repay
+  //         </Text>
+  //       ),
+  //       meta: { width: "118px" },
+  //     }),
+  //   ];
+  // }, []);
 
   return (
     <>
@@ -264,16 +275,43 @@ export default function LoanPage() {
               <Heading as="h5" className="text-[22px] font-semibold">
                 Active Loans Overview
               </Heading>
-              <div className="flex flex-row justify-center w-full p-5 bg-white-A700 rounded-[25px]">
-                <ReactTable
-                  size="sm"
-                  bodyProps={{ className: "md:flex-col" }}
-                  headerProps={{ className: "md:flex-col md:gap-5" }}
-                  rowDataProps={{ className: "md:flex-col md:gap-5" }}
-                  className="w-[1050px] mx-[9px]"
-                  columns={table1Columns}
-                  data={table1Data}
-                />
+              <div>
+                <h2>Loan Data</h2>
+                <table className="loan-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Loan Amount</th>
+                      <th>Net Amount</th>
+                      {/* <th>Repayamount</th> */}
+                      <th>Months Remain</th>
+                      <th>Rate</th>
+                      <th>Installment</th>
+                      <th>Repay</th>
+                      <th>Custum Pay</th>
+                      {/* Add other column headers as needed */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loans.map((loan, index) => (
+                      <tr key={index}>
+                        <td>{loan.loanname}</td>
+                        <td>{loan.amount}</td>
+                        <td>{calculateEMI(loan.amount, loan.rate, loan.timeperiod)*loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth)}</td>
+                        {/* <td>{calculateEMI(loan.amount, loan.rate, loan.timeperiod)*((year-loan.lastyear)*12+(month-loan.lastmonth))}</td> */}
+                        <td>{loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth)}</td>
+                        <td>{loan.rate}</td>
+                        <td>{calculateEMI(loan.amount, loan.rate, loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth))}</td>
+                        <td>{<button type='submit' className="btn btn-primary" onClick={()=>Addrepay(loan._id)}>repay</button> }</td>
+                        <td>{<button className="btn btn-danger">custom</button> }</td>
+                        {/* Add other table cells based on your data */}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+        <div>
+          <button className="btn btn-warning">Add loan</button>
+        </div>
               </div>
             </div>
           </div>

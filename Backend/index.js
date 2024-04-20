@@ -13,7 +13,8 @@ app.use(fileupload({
   useTempFiles:true
 }))
 app.use(express.json())
-
+app.use('/api',require('./Router/Loanroute'));
+app.use('/api',require('./Router/Loanroute'));
 app.use('/api',require('./Routes/CreateUser'));
 app.use('/api',require('./Routes/Loginuser'));
 // Create a Complain model
