@@ -11,6 +11,7 @@ import SignUpPage from "pages/SignUp/Page";
 import Login from "pages/SignIn/Page";
 import TransactionForm from "pages/TransactionForm/Page";
 import EditProfilePage from "pages/SettingEditProfile/Page";
+import Customform from "pages/Customform";
 
 const ProjectRoutes = () => {
   let element = useRoutes([
@@ -51,6 +52,9 @@ const ProjectRoutes = () => {
     {
       path: "editprofile",
       element: <EditProfilePage/>,
+    },{
+      path: "customform/:id",
+      element: <Customform/>,
     },   
   ]);
 

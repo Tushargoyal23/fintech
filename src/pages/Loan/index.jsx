@@ -7,6 +7,7 @@ import { ReactTable } from "../../components/ReactTable";
 import Sidebar1 from "../../components/Sidebar1";
 import { createColumnHelper } from "@tanstack/react-table";
 import '../Loan.css'; // Import the CSS file
+import { Link } from "react-router-dom";
 // function calculateTotalRepayment(principal, monthlyRate, months) {
 //   const r = monthlyRate;
 //   const n = months;
@@ -54,55 +55,57 @@ function calculateEMI(loanAmount, annualInterestRate, loanTenureYears) {
 
   return emi;
 }
-
-// Example usage:
 let loanAmount = 100000; // Loan amount in currency (e.g., dollars)
 let annualInterestRate = 10; // Annual interest rate (in percentage)
 let loanTenureYears = 5; // Loan tenure in years
 
 // Calculate EMI
 let emi = calculateEMI(loanAmount, annualInterestRate, loanTenureYears);
-
-
-
-
-
+console.log(localStorage.getItem("email"))
 export default function LoanPage() {
   const [loans, setLoans] = useState([]);
+  
+  // console.log(loans)
+  const email=localStorage.getItem("email")
+  const getUsers = async () => {
+    
+
+      const res = await fetch(`http://localhost:5000/api/get-loans?email=${email}`,{
+        method:'GET',
+        headers:{
+          'Content-Type': 'application/json'
+        }
+        
+      })
+      const json = await res.json();
+      console.log(res)
+      if (json.success) {
+        setLoans(json.data);
+        
+      }
+    
+  };
+  useEffect(() => {
+    getUsers();
+  }, []);
   const Addrepay= async(id)=>{
     console.log(id)
     try {
       const res = await axios.post(`http://localhost:5000/api/repay/${id}`)
-  
-      if (res.data.success) {
+      console.log(res.data.data)
+    if (res.data.success) {
+      
+      
+      
         setLoans(res.data.data);
         
-        console.log(loans)
       }
     } catch (error) {
       console.log(error);
     }
   }
   console.log(loans)
-  const getUsers = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/get-loans")
-
-      if (res.data.success) {
-        setLoans(res.data.data);
-        console.log(loans)
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    getUsers();
-  }, []);
   
-
-
-  // const table1Columns = React.useMemo(() => {
   //   const table1ColumnHelper = createColumnHelper();
   //   return [
   //     table1ColumnHelper.accessor("slno", {
@@ -296,22 +299,25 @@ export default function LoanPage() {
                     {loans.map((loan, index) => (
                       <tr key={index}>
                         <td>{loan.loanname}</td>
-                        <td>{loan.amount}</td>
-                        <td>{calculateEMI(loan.amount, loan.rate, loan.timeperiod)*loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth)}</td>
+                        <td>{Math.floor(loan.amount)}</td>
+                        <td>{Math.floor(calculateEMI(loan.amount, loan.rate, loan.timeperiod)*(loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth)))}</td>
                         {/* <td>{calculateEMI(loan.amount, loan.rate, loan.timeperiod)*((year-loan.lastyear)*12+(month-loan.lastmonth))}</td> */}
                         <td>{loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth)}</td>
                         <td>{loan.rate}</td>
                         <td>{calculateEMI(loan.amount, loan.rate, loan.timeperiod-(year-loan.loanyear)*12-(month-loan.loanmonth))}</td>
-                        <td>{<button type='submit' className="btn btn-primary" onClick={()=>Addrepay(loan._id)}>repay</button> }</td>
-                        <td>{<button className="btn btn-danger">custom</button> }</td>
+                        <td>{(!loan.paid)?<button type='submit' className="btn btn-primary" onClick={()=>Addrepay(loan._id)}>repay</button>:<button type='submit' className="btn btn-primary" disabled>repay</button> }</td>
+                        <td>{<button className="btn btn-danger"><Link to={`/customform/${loan._id}`}>
+                        custom
+                        </Link>
+                        </button> }</td>
                         {/* Add other table cells based on your data */}
                       </tr>
                     ))}
                   </tbody>
                 </table>
-        <div>
-          <button className="btn btn-warning">Add loan</button>
-        </div>
+                  <div>
+                    <button className="btn btn-warning">Add loan</button>
+                  </div>
               </div>
             </div>
           </div>
