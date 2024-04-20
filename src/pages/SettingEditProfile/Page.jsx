@@ -4,6 +4,7 @@ import { Button, Input, Text, SelectBox, Img } from "../../components";
 import Header from "../../components/Header";
 import Sidebar1 from "../../components/Sidebar1";
 import { Link } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const dropDownOptions = [
   { label: "Option1", value: "option1" },
@@ -13,25 +14,86 @@ const dropDownOptions = [
 
 export default function SettingEditProfilePage() {
 
+
+  const navigate = useNavigate();
+
   const [data, setData] = useState([]);
 
+  
+  const [credentials, setCredentials] = useState({
+    name: '',
+    date:'',
+    address:'',
+    city:'',
+    country:'',
+    postalCode:''
+  });
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    fetchData();
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/finduser/${localStorage.email}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch data');
+        }
+        const jsonData = await response.json();
+        console.log(jsonData.data);
+        if (isMounted) {
+          setData(jsonData.data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error.message);
+      }
+    };
+    if (isMounted) {
+      fetchData();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+
   }, []);
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/finduser/${localStorage.email}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      const jsonData = await response.json();
-      console.log(jsonData.data);
-      setData(jsonData.data);
 
-    } catch (error) {
-      console.error('Error fetching data:', error.message);
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+
+      const response = await fetch('http://localhost:5000/api/createuser',{
+      method:'POST',
+      headers:{
+        'Content-Type': 'application/json'
+      },
+      body:JSON.stringify({name :credentials.name , email:credentials.email , password:credentials.password})
+
+    })
+    const json = await response.json();
+    console.log(json);
+
+    if(!json.success){
+      alert("enter valid credentials")
     }
+    if(json.success){
+      navigate('/login');
+    }
+    } catch (error) {
+      console.error('Error during registration:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onChange = (event) => {
+    setCredentials({ ...credentials, [event.target.name]: event.target.value });
+    console.log(credentials)
   };
 
 
@@ -71,19 +133,18 @@ export default function SettingEditProfilePage() {
                   </div>
                 </div>
                 <div className="flex flex-col items-end justify-start w-[83%] md:w-full">
+                
                   <div className="flex flex-row md:flex-col justify-start w-full gap-[29px] md:gap-5">
                    
-                    <div className="flex flex-col items-start justify-start w-[49%] md:w-full gap-2.5">
+                    <div className="flex flex-col items-start justify-start w-[49%] md:w-full gap-2.5" >
                       <Text as="p" className="text-base font-normal">
                         User Name
                       </Text>
-                      <Input
-                        shape="round"
-                        name="userName"
-                        placeholder={data.name}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="capitalize shadow-2xl p-3 ex w-full outline-none focus:border-solid focus:border-[1px] border-[#035ec5] placeholder:text-black" type="text" placeholder=""  name="name" 
+            value={credentials.name}
+            onChange={onChange}
+          />
+
                     </div>
                   </div>
                   <div className="flex flex-row md:flex-col justify-start w-full mt-[21px] gap-[29px] md:gap-5">
@@ -91,13 +152,10 @@ export default function SettingEditProfilePage() {
                       <Text as="p" className="text-base font-normal">
                         Email
                       </Text>
-                      <Input
-                        shape="round"
-                        name="email"
-                        placeholder={data.email}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="capitalize shadow-2xl p-3 ex w-full outline-none focus:border-solid focus:border-[1px] border-[#035ec5] placeholder:text-black" type="text" placeholder={data.email}  name="email" 
+                      disabled
+          />
+
                     </div>
                     
                   </div>
@@ -106,13 +164,10 @@ export default function SettingEditProfilePage() {
                       <Text as="p" className="text-base font-normal">
                         Date of Birth
                       </Text>
-                      <Input
-                        shape="round"
-                        name="date"
-                        placeholder={data.date}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="p-3 shadow-2xl   glass w-full text-black outline-none focus:border-solid focus:border-[1px]border-[#035ec5]" type="date" name="date"
+            value={credentials.date}
+            onChange={onChange}
+          />
                     </div>
                     
                   </div>
@@ -121,13 +176,10 @@ export default function SettingEditProfilePage() {
                       <Text as="p" className="text-base font-normal">
                         Present Address
                       </Text>
-                      <Input
-                        shape="round"
-                        name="address"
-                        placeholder={data.address}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="capitalize shadow-2xl p-3 ex w-full outline-none focus:border-solid focus:border-[1px] border-[#035ec5] placeholder:text-black" type="text" placeholder=""  name="address" 
+            value={credentials.address}
+            onChange={onChange}
+          />
                     </div>
                   </div>
                   <div className="flex flex-row md:flex-col justify-start items-center w-full mt-[21px] gap-[29px] md:gap-5">
@@ -135,13 +187,10 @@ export default function SettingEditProfilePage() {
                       <Text as="p" className="text-base font-normal">
                         City
                       </Text>
-                      <Input
-                        shape="round"
-                        name="city"
-                        placeholder={data.city}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="capitalize shadow-2xl p-3 ex w-full outline-none focus:border-solid focus:border-[1px] border-[#035ec5] placeholder:text-black" type="text" placeholder=""  name="city" 
+            value={credentials.city}
+            onChange={onChange}
+          />
                     </div>
                   </div>
                   <div className="flex flex-row md:flex-col justify-start items-center w-full mt-[21px] gap-[29px] md:gap-5">
@@ -149,13 +198,10 @@ export default function SettingEditProfilePage() {
                       <Text as="p" className="text-base font-normal">
                         Country
                       </Text>
-                      <Input
-                        shape="round"
-                        name="country"
-                        placeholder={data.country}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="capitalize shadow-2xl p-3 ex w-full outline-none focus:border-solid focus:border-[1px] border-[#035ec5] placeholder:text-black" type="text" placeholder=""  name="country" 
+            value={credentials.country}
+            onChange={onChange}
+          />
                     </div>
                   </div>
                   <div className="flex flex-row md:flex-col justify-start items-center w-full mt-[21px] gap-[29px] md:gap-5">
@@ -163,26 +209,22 @@ export default function SettingEditProfilePage() {
                       <Text as="p" className="text-base font-normal">
                         Postal Code
                       </Text>
-                      <Input
-                        shape="round"
-                        name="zipcode"
-                        placeholder={data.postalCode}
-                        className="w-full sm:w-full border-gray-300 border border-solid"
-                        disabled
-                      />
+                      <input class="capitalize shadow-2xl p-3 ex w-full outline-none focus:border-solid focus:border-[1px] border-[#035ec5] placeholder:text-black" type="text" placeholder=""  name="postalCode" 
+            value={credentials.postalCode}
+            onChange={onChange}
+          />
                     </div>
                     
                   </div>
-                  <Link  href="/editprofile">
                   <Button
+                  type="submit"
                     color="indigo_600_01"
                     size="lg"
                     className="mt-[30px] sm:px-5 font-medium min-w-[190px] rounded-[15px] sm:min-w-full"
                   >
-                 Edit or Update Profile
+                 Save Profile
                    
                   </Button>
-                  </Link> 
                 </div>
               </div>
             </div>

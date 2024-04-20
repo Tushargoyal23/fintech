@@ -8,6 +8,9 @@ import Investments from "pages/Investments";
 import Loan from "pages/Loan";
 import SettingEditProfile from "pages/SettingEditProfile";
 import SignUpPage from "pages/SignUp/Page";
+import Login from "pages/SignIn/Page";
+import TransactionForm from "pages/TransactionForm/Page";
+import EditProfilePage from "pages/SettingEditProfile/Page";
 
 const ProjectRoutes = () => {
   let element = useRoutes([
@@ -30,13 +33,25 @@ const ProjectRoutes = () => {
       element: <Loan />,
     },
     {
-      path: "settingeditprofile",
+      path: "profile",
       element: <SettingEditProfile />,
     },
     {
       path: "signup",
       element: <SignUpPage />,
-    }
+    },
+    {
+      path: "login",
+      element: <Login/>,
+    },
+    {
+      path: "transactionform",
+      element: <TransactionForm/>,
+    },
+    {
+      path: "editprofile",
+      element: <EditProfilePage/>,
+    },   
   ]);
 
   return element;
