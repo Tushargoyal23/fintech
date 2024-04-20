@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Heading, Text, Button, Img } from "../../components";
 import Header from "../../components/Header";
+import Barchart from "../../components/Barchart";
 import Sidebar1 from "../../components/Sidebar1";
 
 export default function AccountsPage() {
@@ -152,6 +153,7 @@ export default function AccountsPage() {
                 <Heading as="h5" className="text-[22px] font-semibold">
                   Debit & Credit Overview
                 </Heading>
+                <Barchart/>
                 <div className="flex flex-row justify-start w-full">
                   <div className="flex flex-row justify-center w-full p-[26px] sm:p-5 bg-white-A700 rounded-[25px]">
                     <div className="flex flex-col items-center justify-start w-[99%] gap-[26px] mx-[3px]">
