@@ -1,10 +1,31 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { Heading, Text, Button, Img } from "../../components";
 import Header from "../../components/Header";
 import Sidebar1 from "../../components/Sidebar1";
 
 export default function AccountsPage() {
+
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/get-transactions/${localStorage.email}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      const jsonData = await response.json();
+      console.log(jsonData.data);
+      setData(jsonData.data);
+    } catch (error) {
+      console.error('Error fetching data:', error.message);
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -75,159 +96,56 @@ export default function AccountsPage() {
                 <Heading as="h5" className="text-[22px] font-semibold">
                   Last Transaction
                 </Heading>
-                <div className="flex flex-row justify-start w-full">
-                  <div className="flex flex-col w-full gap-2.5 p-[25px] sm:p-5 bg-white-A700 rounded-[25px]">
-                    <div className="flex flex-row md:flex-col justify-between items-center w-full md:gap-10">
-                      <div className="flex flex-row sm:flex-col justify-center items-center w-[83%] md:w-full sm:gap-5">
-                        <Button size="2xl" shape="round" className="w-[55px]">
-                          <Img src="images/img_renew_1.svg" />
-                        </Button>
-                        <div className="flex flex-col items-start justify-start w-[28%] sm:w-full ml-[25px] gap-1 sm:ml-5">
-                          <Text as="p" className="!text-blue_gray-900 text-base font-medium">
-                            Spotify Subscription
-                          </Text>
-                          <Text size="lg" as="p" className="text-[15px] font-normal">
-                            25 Jan 2021
-                          </Text>
-                        </div>
-                        <Text as="p" className="ml-[31px] sm:ml-5 text-base font-normal">
-                          Shopping
-                        </Text>
-                        <Text as="p" className="ml-[43px] md:ml-5 text-base font-normal">
-                          1234 ****
-                        </Text>
-                        <Text as="p" className="ml-[45px] md:ml-5 text-base font-normal">
-                          Pending
-                        </Text>
-                      </div>
-                      <Text as="p" className="!text-red-700 text-right text-base font-medium">
-                        -$150
-                      </Text>
-                    </div>
-                    <div className="flex flex-row sm:flex-col justify-between items-center w-full sm:gap-10">
-                      <div className="flex flex-row justify-start items-start w-[29%] sm:w-full gap-[25px]">
-                        <Button size="2xl" shape="round" className="w-[55px]">
-                          <Img src="images/img_group_327.svg" />
-                        </Button>
-                        <div className="flex flex-col items-start justify-start w-[59%] mt-1 gap-1.5">
-                          <Text as="p" className="!text-blue_gray-900 text-base font-medium">
-                            Mobile Service
-                          </Text>
-                          <Text size="lg" as="p" className="text-[15px] font-normal">
-                            25 Jan 2021
-                          </Text>
-                        </div>
-                      </div>
-                      <Text as="p" className="text-base font-normal">
-                        Service
-                      </Text>
-                      <div className="flex flex-row justify-between w-auto">
-                        <Text as="p" className="text-base font-normal">
-                          1234 ****
-                        </Text>
-                        <Text as="p" className="text-base font-normal">
-                          Completed
-                        </Text>
-                        <Text as="p" className="!text-red-700 text-right text-base font-medium">
-                          -$340
-                        </Text>
-                      </div>
-                    </div>
-                    <div className="flex flex-row md:flex-col justify-between items-center w-full md:gap-10">
-                      <div className="flex flex-row justify-start items-center w-[27%] md:w-full gap-[25px]">
-                        <Button size="2xl" shape="round" className="w-[55px]">
-                          <Img src="images/img_group_326.svg" />
-                        </Button>
-                        <div className="flex flex-col items-start justify-start w-[56%] gap-1">
-                          <Text as="p" className="!text-blue_gray-900 text-base font-medium">
-                            Emilly Wilson
-                          </Text>
-                          <Text size="lg" as="p" className="text-[15px] font-normal">
-                            25 Jan 2021
-                          </Text>
+
+                <div className="flex flex-row md:flex-col justify-between items-center w-full md:gap-10">
+                  <div>
+                    {/* Render data */}
+                    {data.map((item, index) => (
+                      <div key={index}> {/* Move the key attribute to the outermost wrapping div */}
+                        <div className="flex flex-row md:flex-col justify-between items-center w-full md:gap-10">
+                          <div className="flex flex-row justify-start items-center w-[27%] md:w-full gap-[25px]">
+                            {/* <Button size="2xl" shape="round" className="w-[55px]">
+                              <Img src={item.image} />
+                            </Button> */}
+                            {index +1}
+                            <div className="flex flex-col items-start justify-start w-[56%] gap-1">
+                              <Text as="p" className="!text-blue_gray-900 text-base font-medium">
+                                {item.name} {/* Assuming your data object has a 'name' property */}
+                              </Text>
+                              <Text size="lg" as="p" className="text-[15px] font-normal">
+                                {item.date} {/* Assuming your data object has a 'date' property */}
+                              </Text>
+                            </div>
+                          </div>
+                          <div className="flex flex-row justify-between w-auto">
+                            <Text as="p" className="text-base font-normal">
+                              <b>
+                              {item.type}&nbsp;&nbsp; {/* Assuming your data object has a 'type' property */}
+                              </b>
+                            </Text>
+                            <Text as="p" className="text-base font-normal">
+                              {item.paymentMethod}&nbsp;&nbsp;{/* Assuming your data object has a 'paymentMethod' property */}
+                            </Text>
+                            <Text as="p" className="text-base font-normal">
+                              {item.status} {/* Assuming your data object has a 'status' property */}
+                            </Text>
+                            {item.type == "debit"?<Text as="p" className="!text-red-600 text-right text-base font-medium">
+                              {-item.amount} {/* Assuming your data object has an 'amount' property */}
+                            </Text>:
+                            <Text as="p" className="!text-green-600 text-right text-base font-medium">
+                              +{item.amount} {/* Assuming your data object has an 'amount' property */}
+                            </Text>
+                            }
+                          </div>
                         </div>
                       </div>
-                      <div className="flex flex-row justify-between w-auto">
-                        <Text as="p" className="text-base font-normal">
-                          Transfer
-                        </Text>
-                        <Text as="p" className="text-base font-normal">
-                          1234 ****
-                        </Text>
-                        <Text as="p" className="text-base font-normal">
-                          Completed
-                        </Text>
-                        <Text as="p" className="!text-green-600 text-right text-base font-medium">
-                          +$780
-                        </Text>
-                      </div>
-                    </div>
+                    ))}
                   </div>
+
                 </div>
               </div>
-              <div className="flex flex-row justify-start w-[32%] md:w-full">
-                <div className="flex flex-col items-center justify-start w-full gap-[17px]">
-                  <div className="flex flex-row justify-between items-center w-full">
-                    <Heading as="h6" className="text-[22px] font-semibold">
-                      My Card
-                    </Heading>
-                    <a >
-                      <Heading size="md" as="h6" className="text-right text-[17px] font-semibold">
-                        See All
-                      </Heading>
-                    </a>
-                  </div>
-                  <div className="flex flex-row justify-center w-full">
-                    <div className="flex flex-col items-center justify-start w-full pt-6 gap-[37px] sm:pt-5 bg-indigo-600_01 rounded-[25px]">
-                      <div className="flex flex-col items-start justify-start w-[86%] md:w-full gap-[22px]">
-                        <div className="flex flex-row justify-between items-start w-full">
-                          <div className="flex flex-col items-start justify-start gap-[3px]">
-                            <Text size="xs" as="p" className="!text-white-A700 text-xs font-normal">
-                              Balance
-                            </Text>
-                            <Text size="4xl" as="p" className="!text-white-A700 text-xl font-normal">
-                              $5,756
-                            </Text>
-                          </div>
-                          <Img
-                            src="images/img_chip_card.png"
-                            alt="chipcard_one"
-                            className="w-[34px] md:h-auto object-cover"
-                          />
-                        </div>
-                        <div className="flex flex-row justify-between w-[77%] md:w-full">
-                          <div className="flex flex-col items-start justify-start gap-1">
-                            <Text size="xs" as="p" className="!text-white-A700_b2 text-xs font-normal">
-                              CARD HOLDER
-                            </Text>
-                            <Text size="lg" as="p" className="!text-white-A700 text-[15px] font-normal">
-                              Eddy Cusuma
-                            </Text>
-                          </div>
-                          <div className="flex flex-col items-start justify-start gap-1">
-                            <Text size="xs" as="p" className="!text-white-A700_b2 text-xs font-normal">
-                              VALID THRU
-                            </Text>
-                            <Text size="lg" as="p" className="!text-white-A700 text-[15px] font-normal">
-                              12/22
-                            </Text>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex flex-row justify-center w-full">
-                        <div className="flex flex-row justify-center w-full p-5 rounded-bl-[25px] rounded-br-[25px] bg-gradient">
-                          <div className="flex flex-row justify-between items-center w-[97%] ml-1.5 mr-1">
-                            <Text size="5xl" as="p" className="!text-white-A700 text-[22px] font-normal">
-                              3778 **** **** 1234
-                            </Text>
-                            <Img src="images/img_group_17.svg" alt="image_one" className="h-[30px]" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* <div className="flex flex-row justify-start w-[32%] md:w-full">
+              </div> */}
             </div>
             <div className="flex flex-row md:flex-col justify-start w-full gap-[30px] md:gap-5">
               <div className="flex flex-col items-start justify-start w-[66%] md:w-full gap-[19px]">

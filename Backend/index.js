@@ -16,6 +16,7 @@ app.use(express.json())
 
 app.use('/api',require('./Routes/CreateUser'));
 app.use('/api',require('./Routes/Loginuser'));
+app.use('/api',require('./Router/Transaction'));
 // Create a Complain model
 
 app.listen(port, () => {
